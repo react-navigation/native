@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, Keyboard } from 'react-native';
 
 export default (Navigator, navigatorConfig) =>
   class KeyboardAwareNavigator extends React.Component {
@@ -45,7 +45,7 @@ export default (Navigator, navigatorConfig) =>
       if (transitionProps.index !== prevTransitionProps.index) {
         const currentField = TextInput.State.currentlyFocusedField();
         if (currentField) {
-          TextInput.State.blurTextInput(currentField);
+          Keyboard.dismiss();
         }
       }
 
