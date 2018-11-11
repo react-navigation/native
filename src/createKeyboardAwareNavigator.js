@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, UIManager } from 'react-native';
 
 export default (Navigator, navigatorConfig) =>
   class KeyboardAwareNavigator extends React.Component {
@@ -43,9 +43,26 @@ export default (Navigator, navigatorConfig) =>
       // in the case where the index did not change, I believe. We
       // should revisit this after 2.0 release.
       if (transitionProps.index !== prevTransitionProps.index) {
-        const currentField = TextInput.State.currentlyFocusedField();
-        if (currentField) {
-          TextInput.State.blurTextInput(currentField);
+        const currentFocusedField = TextInput.State.currentlyFocusedField();
+        if (currentFocusedField) {
+          const previousSceneTag =
+            prevTransitionProps &&
+            prevTransitionProps.scene &&
+            prevTransitionProps.scene.route &&
+            prevTransitionProps.scene.route.params &&
+            prevTransitionProps.scene.route.params.nodeTag;
+          if (previousSceneTag) {
+            UIManager.viewIsDescendantOf(
+              currentFocusedField,
+              previousSceneTag,
+              isDescendant => {
+                if (isDescendant)
+                  TextInput.State.blurTextInput(currentFocusedField);
+              }
+            );
+          } else {
+            TextInput.State.blurTextInput(currentFocusedField);
+          }
         }
       }
 
