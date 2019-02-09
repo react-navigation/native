@@ -204,7 +204,6 @@ export default function createNavigationContainer(Component) {
         }
       }
       _statefulContainerCount++;
-      Linking.addEventListener('url', this._handleOpenURL);
 
       // Pull out anything that can impact state
       const {
@@ -276,15 +275,20 @@ export default function createNavigationContainer(Component) {
           })
         );
 
-      if (startupState === this.state.nav) {
+      const onFinishSettingUpNavState = () => {
+        Linking.addEventListener('url', this._handleOpenURL);
         dispatchActions();
+      };
+
+      if (startupState === this.state.nav) {
+        onFinishSettingUpNavState();
         return;
       }
 
       // eslint-disable-next-line react/no-did-mount-set-state
       this.setState({ nav: startupState }, () => {
         _reactNavigationIsHydratingState = false;
-        dispatchActions();
+        onFinishSettingUpNavState();
       });
     }
 
