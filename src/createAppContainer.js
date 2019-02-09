@@ -276,7 +276,9 @@ export default function createNavigationContainer(Component) {
         );
 
       const onFinishSettingUpNavState = () => {
-        Linking.addEventListener('url', this._handleOpenURL);
+        this.props.addUrlListener
+          ? this.props.addUrlListener(this._handleOpenURL)
+          : Linking.addEventListener('url', this._handleOpenURL);
         dispatchActions();
       };
 
@@ -314,7 +316,18 @@ export default function createNavigationContainer(Component) {
 
     componentWillUnmount() {
       this._isMounted = false;
-      Linking.removeEventListener('url', this._handleOpenURL);
+
+      if (this.props.addUrlListener) {
+        const { removeUrlListener } = this.props;
+        invariant(
+          removeUrlListener,
+          'should be provided when using addUrlListener'
+        );
+        removeUrlListener(this._handleOpenURL);
+      } else {
+        Linking.removeEventListener('url', this._handleOpenURL);
+      }
+
       this.subs && this.subs.remove();
 
       if (this._isStateful()) {
