@@ -37,6 +37,13 @@ function validateProps(props) {
   }
 }
 
+function defaultNavigationStatePersister = async (navState, persistenceKey) => {
+  if (!persistenceKey) {
+    return;
+  }
+  await AsyncStorage.setItem(persistenceKey, JSON.stringify(navState));
+};
+
 // Track the number of stateful container instances. Warn if >0 and not using the
 // detached prop to explicitly acknowledge the behavior. We should deprecated implicit
 // stateful navigation containers in a future release and require a provider style pattern
@@ -70,6 +77,10 @@ export default function createNavigationContainer(Component) {
     static getDerivedStateFromProps(nextProps) {
       validateProps(nextProps);
       return null;
+    }
+
+    static defaultProps = {
+      persistNavigationState: defaultNavigationStatePersister
     }
 
     _actionEventSubscribers = new Set();
@@ -294,10 +305,7 @@ export default function createNavigationContainer(Component) {
 
     _persistNavigationState = async nav => {
       const { persistenceKey } = this.props;
-      if (!persistenceKey) {
-        return;
-      }
-      await AsyncStorage.setItem(persistenceKey, JSON.stringify(nav));
+      await this.props.persistNavigationState(nav, persistenceKey)
     };
 
     componentWillUnmount() {
