@@ -20,8 +20,16 @@ function validateProps(props) {
   if (isStateful(props)) {
     return;
   }
-  // eslint-disable-next-line no-unused-vars
-  const { navigation, screenProps, ...containerProps } = props;
+  /* eslint-disable no-unused-vars */
+  const {
+    navigation,
+    screenProps,
+    persistNavigationState,
+    loadNavigationState,
+    persistenceKey,
+    ...containerProps
+  } = props;
+  /* eslint-enable no-unused-vars */
 
   const keys = Object.keys(containerProps);
 
@@ -37,12 +45,16 @@ function validateProps(props) {
   }
 }
 
-function defaultNavigationStatePersister = async (navState, persistenceKey) => {
+async function defaultNavigationStatePersister(navState, persistenceKey) {
   if (!persistenceKey) {
     return;
   }
   await AsyncStorage.setItem(persistenceKey, JSON.stringify(navState));
-};
+}
+
+async function defaultNavigationStateLoader(persistenceKey) {
+  return persistenceKey && (await AsyncStorage.getItem(persistenceKey));
+}
 
 // Track the number of stateful container instances. Warn if >0 and not using the
 // detached prop to explicitly acknowledge the behavior. We should deprecated implicit
@@ -80,8 +92,9 @@ export default function createNavigationContainer(Component) {
     }
 
     static defaultProps = {
-      persistNavigationState: defaultNavigationStatePersister
-    }
+      persistNavigationState: defaultNavigationStatePersister,
+      loadNavigationState: defaultNavigationStateLoader,
+    };
 
     _actionEventSubscribers = new Set();
 
@@ -217,12 +230,16 @@ export default function createNavigationContainer(Component) {
       Linking.addEventListener('url', this._handleOpenURL);
 
       // Pull out anything that can impact state
-      const { persistenceKey, uriPrefix, enableURLHandling } = this.props;
+      const {
+        persistenceKey,
+        uriPrefix,
+        enableURLHandling,
+        loadNavigationState,
+      } = this.props;
       let parsedUrl = null;
       let startupStateJSON = null;
       if (enableURLHandling !== false) {
-        startupStateJSON =
-          persistenceKey && (await AsyncStorage.getItem(persistenceKey));
+        startupStateJSON = await loadNavigationState(persistenceKey);
         const url = await Linking.getInitialURL();
         parsedUrl = url && urlToPathAndParams(url, uriPrefix);
       }
@@ -305,7 +322,7 @@ export default function createNavigationContainer(Component) {
 
     _persistNavigationState = async nav => {
       const { persistenceKey } = this.props;
-      await this.props.persistNavigationState(nav, persistenceKey)
+      await this.props.persistNavigationState(nav, persistenceKey);
     };
 
     componentWillUnmount() {

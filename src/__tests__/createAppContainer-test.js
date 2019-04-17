@@ -272,4 +272,46 @@ describe('NavigationContainer', () => {
       });
     });
   });
+
+  // https://github.com/facebook/jest/issues/2157#issuecomment-279171856
+  const flushPromises = () => new Promise(resolve => setImmediate(resolve));
+
+  describe('state persistence', () => {
+    const persistenceKey = 'persistenceKey';
+
+    it('on a nav state change, persistNavigationState is called with state and persistence key', async () => {
+      const persistNavigationState = jest.fn();
+      const loadNavigationState = jest.fn().mockResolvedValue(
+        JSON.stringify({
+          index: 1,
+          routes: [{ routeName: 'foo' }, { routeName: 'bar' }],
+        })
+      );
+
+      const navigationContainer = renderer
+        .create(
+          <NavigationContainer
+            persistNavigationState={persistNavigationState}
+            loadNavigationState={loadNavigationState}
+            persistenceKey={persistenceKey}
+          />
+        )
+        .getInstance();
+      // wait for the loadNavigationState() to resolve
+      await flushPromises();
+      expect(loadNavigationState).toHaveBeenCalledWith(persistenceKey);
+
+      // wait for setState done
+      jest.runOnlyPendingTimers();
+
+      navigationContainer.dispatch(
+        NavigationActions.navigate({ routeName: 'foo' })
+      );
+      jest.runOnlyPendingTimers();
+      expect(persistNavigationState).toHaveBeenCalledWith(
+        { index: 0, isTransitioning: true, routes: [{ routeName: 'foo' }] },
+        persistenceKey
+      );
+    });
+  });
 });
