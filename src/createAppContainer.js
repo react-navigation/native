@@ -1,6 +1,5 @@
 import React from 'react';
-import { AsyncStorage, Linking, Platform, BackHandler } from 'react-native';
-
+import { Linking, Platform, BackHandler } from 'react-native';
 import {
   NavigationActions,
   pathUtils,
@@ -26,7 +25,6 @@ function validateProps(props) {
     screenProps,
     persistNavigationState,
     loadNavigationState,
-    persistenceKey,
     ...containerProps
   } = props;
   /* eslint-enable no-unused-vars */
@@ -43,17 +41,13 @@ function validateProps(props) {
         'navigator should maintain its own state, do not pass a navigation prop.'
     );
   }
-}
-
-async function defaultNavigationStatePersister(navState, persistenceKey) {
-  if (!persistenceKey) {
-    return;
-  }
-  await AsyncStorage.setItem(persistenceKey, JSON.stringify(navState));
-}
-
-async function defaultNavigationStateLoader(persistenceKey) {
-  return persistenceKey && (await AsyncStorage.getItem(persistenceKey));
+  invariant(
+    (persistNavigationState === undefined &&
+      loadNavigationState === undefined) ||
+      (typeof persistNavigationState === 'function' &&
+        typeof loadNavigationState === 'function'),
+    'both persistNavigationState and loadNavigationState must either be undefined, or be functions'
+  );
 }
 
 // Track the number of stateful container instances. Warn if >0 and not using the
@@ -91,11 +85,6 @@ export default function createNavigationContainer(Component) {
       return null;
     }
 
-    static defaultProps = {
-      persistNavigationState: defaultNavigationStatePersister,
-      loadNavigationState: defaultNavigationStateLoader,
-    };
-
     _actionEventSubscribers = new Set();
 
     constructor(props) {
@@ -120,7 +109,7 @@ export default function createNavigationContainer(Component) {
 
       this.state = {
         nav:
-          this._isStateful() && !props.persistenceKey
+          this._isStateful() && !props.loadNavigationState
             ? Component.router.getStateForAction(this._initialAction)
             : null,
       };
@@ -230,16 +219,11 @@ export default function createNavigationContainer(Component) {
       Linking.addEventListener('url', this._handleOpenURL);
 
       // Pull out anything that can impact state
-      const {
-        persistenceKey,
-        uriPrefix,
-        enableURLHandling,
-        loadNavigationState,
-      } = this.props;
+      const { uriPrefix, enableURLHandling, loadNavigationState } = this.props;
       let parsedUrl = null;
       let startupStateJSON = null;
       if (enableURLHandling !== false) {
-        startupStateJSON = await loadNavigationState(persistenceKey);
+        startupStateJSON = loadNavigationState && (await loadNavigationState());
         const url = await Linking.getInitialURL();
         parsedUrl = url && urlToPathAndParams(url, uriPrefix);
       }
@@ -255,7 +239,7 @@ export default function createNavigationContainer(Component) {
         startupState = Component.router.getStateForAction(action);
       }
 
-      // Pull persisted state from AsyncStorage
+      // Pull user-provided persisted state
       if (startupStateJSON) {
         try {
           startupState = JSON.parse(startupStateJSON);
@@ -321,8 +305,10 @@ export default function createNavigationContainer(Component) {
     }
 
     _persistNavigationState = async nav => {
-      const { persistenceKey } = this.props;
-      await this.props.persistNavigationState(nav, persistenceKey);
+      const { persistNavigationState } = this.props;
+      if (persistNavigationState) {
+        await this.props.persistNavigationState(nav);
+      }
     };
 
     componentWillUnmount() {

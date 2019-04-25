@@ -277,9 +277,7 @@ describe('NavigationContainer', () => {
   const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 
   describe('state persistence', () => {
-    const persistenceKey = 'persistenceKey';
-
-    it('on a nav state change, persistNavigationState is called with state and persistence key', async () => {
+    it('loadNavigationState is called upon mount and persistNavigationState is called on a nav state change', async () => {
       const persistNavigationState = jest.fn();
       const loadNavigationState = jest.fn().mockResolvedValue(
         JSON.stringify({
@@ -293,13 +291,12 @@ describe('NavigationContainer', () => {
           <NavigationContainer
             persistNavigationState={persistNavigationState}
             loadNavigationState={loadNavigationState}
-            persistenceKey={persistenceKey}
           />
         )
         .getInstance();
       // wait for the loadNavigationState() to resolve
       await flushPromises();
-      expect(loadNavigationState).toHaveBeenCalledWith(persistenceKey);
+      expect(loadNavigationState).toHaveBeenCalled();
 
       // wait for setState done
       jest.runOnlyPendingTimers();
@@ -308,10 +305,19 @@ describe('NavigationContainer', () => {
         NavigationActions.navigate({ routeName: 'foo' })
       );
       jest.runOnlyPendingTimers();
-      expect(persistNavigationState).toHaveBeenCalledWith(
-        { index: 0, isTransitioning: true, routes: [{ routeName: 'foo' }] },
-        persistenceKey
-      );
+      expect(persistNavigationState).toHaveBeenCalledWith({
+        index: 0,
+        isTransitioning: true,
+        routes: [{ routeName: 'foo' }],
+      });
+    });
+
+    it('throws when persistNavigationState and loadNavigationState do not pass validation', () => {
+      expect(() =>
+        renderer.create(
+          <NavigationContainer persistNavigationState={jest.fn()} />
+        )
+      ).toThrow();
     });
   });
 });
