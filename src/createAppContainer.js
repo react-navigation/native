@@ -307,7 +307,7 @@ export default function createNavigationContainer(Component) {
     _persistNavigationState = async nav => {
       const { persistNavigationState } = this.props;
       if (persistNavigationState) {
-        await this.props.persistNavigationState(nav);
+        await persistNavigationState(nav);
       }
     };
 
