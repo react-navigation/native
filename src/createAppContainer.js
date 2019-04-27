@@ -221,11 +221,14 @@ export default function createNavigationContainer(Component) {
       // Pull out anything that can impact state
       const { uriPrefix, enableURLHandling, loadNavigationState } = this.props;
       let parsedUrl = null;
-      let startupStateJSON = null;
+      let deserializedStartupState = null;
       if (enableURLHandling !== false) {
-        startupStateJSON = loadNavigationState && (await loadNavigationState());
-        const url = await Linking.getInitialURL();
+        const [url, loadedNavState] = await Promise.all([
+          Linking.getInitialURL(),
+          loadNavigationState && loadNavigationState(),
+        ]);
         parsedUrl = url && urlToPathAndParams(url, uriPrefix);
+        deserializedStartupState = loadedNavState;
       }
 
       // Initialize state. This must be done *after* any async code
@@ -240,13 +243,9 @@ export default function createNavigationContainer(Component) {
       }
 
       // Pull user-provided persisted state
-      if (startupStateJSON) {
-        try {
-          startupState = JSON.parse(startupStateJSON);
-          _reactNavigationIsHydratingState = true;
-        } catch (e) {
-          /* do nothing */
-        }
+      if (deserializedStartupState) {
+        startupState = deserializedStartupState;
+        _reactNavigationIsHydratingState = true;
       }
 
       // Pull state out of URL

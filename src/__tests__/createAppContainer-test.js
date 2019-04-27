@@ -279,12 +279,10 @@ describe('NavigationContainer', () => {
   describe('state persistence', () => {
     it('loadNavigationState is called upon mount and persistNavigationState is called on a nav state change', async () => {
       const persistNavigationState = jest.fn();
-      const loadNavigationState = jest.fn().mockResolvedValue(
-        JSON.stringify({
-          index: 1,
-          routes: [{ routeName: 'foo' }, { routeName: 'bar' }],
-        })
-      );
+      const loadNavigationState = jest.fn().mockResolvedValue({
+        index: 1,
+        routes: [{ routeName: 'foo' }, { routeName: 'bar' }],
+      });
 
       const navigationContainer = renderer
         .create(
