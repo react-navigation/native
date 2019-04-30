@@ -1,5 +1,6 @@
 import React from 'react';
-import { AsyncStorage, Linking, Platform, BackHandler } from 'react-native';
+import { Linking, Platform, BackHandler } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import {
   NavigationActions,
