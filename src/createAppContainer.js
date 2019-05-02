@@ -317,7 +317,7 @@ export default function createNavigationContainer(Component) {
       if (_reactNavigationIsHydratingState) {
         _reactNavigationIsHydratingState = false;
         console.warn(
-          'Uncaught exception while starting app from persisted navigation state! Trying to render again with a fresh navigation state..'
+          'Uncaught exception while starting app from persisted navigation state! Trying to render again with a fresh navigation state...'
         );
         this.dispatch(NavigationActions.init());
       } else {
@@ -328,7 +328,13 @@ export default function createNavigationContainer(Component) {
     _persistNavigationState = async nav => {
       const { persistNavigationState } = this.props;
       if (persistNavigationState) {
-        await persistNavigationState(nav);
+        try {
+          await persistNavigationState(nav);
+        } catch (err) {
+          console.warn(
+            'Uncaught exception while calling persistNavigationState()! You should handle exceptions thrown from persistNavigationState(), ignoring them may result in undefined behavior.'
+          );
+        }
       }
     };
 

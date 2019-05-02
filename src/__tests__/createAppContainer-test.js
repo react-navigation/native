@@ -322,6 +322,30 @@ describe('NavigationContainer', () => {
       });
     });
 
+    it('when persistNavigationState rejects, a console warning is shown', async () => {
+      const consoleSpy = jest.spyOn(console, 'warn');
+      const persistNavigationState = jest
+        .fn()
+        .mockRejectedValue(new Error('serialization failed'));
+      const loadNavigationState = jest.fn().mockResolvedValue(null);
+
+      const navigationContainer = await createPersistenceEnabledContainer(
+        loadNavigationState,
+        persistNavigationState
+      );
+
+      // wait for setState done
+      jest.runOnlyPendingTimers();
+
+      navigationContainer.dispatch(
+        NavigationActions.navigate({ routeName: 'baz' })
+      );
+      jest.runOnlyPendingTimers();
+      await flushPromises();
+
+      expect(consoleSpy).toHaveBeenCalledWith(expect.any(String));
+    });
+
     it('when loadNavigationState rejects, navigator ignores the rejection and starts from the initial state', async () => {
       const loadNavigationState = jest
         .fn()
