@@ -227,16 +227,13 @@ export default function createNavigationContainer(Component) {
       Linking.addEventListener('url', this._handleOpenURL);
 
       // Pull out anything that can impact state
-      const { uriPrefix, enableURLHandling, loadNavigationState } = this.props;
       let parsedUrl = null;
       let userProvidedStartupState = null;
-      if (enableURLHandling !== false) {
-        const [url, loadedNavState] = await Promise.all([
-          Linking.getInitialURL(),
-          loadNavigationState && loadNavigationState(),
-        ]);
-        parsedUrl = url && urlToPathAndParams(url, uriPrefix);
-        userProvidedStartupState = loadedNavState;
+      if (this.props.enableURLHandling !== false) {
+        ({
+          parsedUrl,
+          userProvidedStartupState,
+        } = await this.getStartupParams());
       }
 
       // Initialize state. This must be done *after* any async code
@@ -244,7 +241,7 @@ export default function createNavigationContainer(Component) {
       // due to changes while async function was resolving
       let action = this._initialAction;
       let startupState = this.state.nav;
-      if (!startupState) {
+      if (!startupState && !userProvidedStartupState) {
         !!process.env.REACT_NAV_LOGGING &&
           console.log('Init new Navigation State');
         startupState = Component.router.getStateForAction(action);
@@ -297,6 +294,23 @@ export default function createNavigationContainer(Component) {
         _reactNavigationIsHydratingState = false;
         dispatchActions();
       });
+    }
+
+    async getStartupParams() {
+      const { uriPrefix, loadNavigationState } = this.props;
+      let url, loadedNavState;
+      try {
+        [url, loadedNavState] = await Promise.all([
+          Linking.getInitialURL(),
+          loadNavigationState && loadNavigationState(),
+        ]);
+      } catch (err) {
+        // ignore
+      }
+      return {
+        parsedUrl: url && urlToPathAndParams(url, uriPrefix),
+        userProvidedStartupState: loadedNavState,
+      };
     }
 
     componentDidCatch(e) {
