@@ -16,6 +16,14 @@ function isStateful(props) {
 }
 
 function validateProps(props) {
+  if (props.persistenceKey) {
+    console.warn(
+      'You passed persistenceKey prop to a navigator. ' +
+        'The persistenceKey prop was replaced by a more flexible persistence mechanism, ' +
+        'please see the navigation state persistence docs for more information. ' +
+        'Passing the persistenceKey prop is a no-op.'
+    );
+  }
   if (isStateful(props)) {
     return;
   }
@@ -48,14 +56,6 @@ function validateProps(props) {
         typeof loadNavigationState === 'function'),
     'both persistNavigationState and loadNavigationState must either be undefined, or be functions'
   );
-  if (props.persistenceKey) {
-    console.warn(
-      'You passed persistenceKey prop to a navigator. ' +
-        'The persistenceKey prop was replaced by a more flexible persistence mechanism, ' +
-        'please see the navigation state persistence docs for more information. ' +
-        'Passing the persistenceKey prop is a no-op.'
-    );
-  }
 }
 
 // Track the number of stateful container instances. Warn if >0 and not using the
