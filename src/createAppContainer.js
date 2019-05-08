@@ -310,7 +310,9 @@ export default function createNavigationContainer(Component) {
       }
     }
 
-    // Per-tick temporary storage for state.nav
+    _waitForTransition = transitionPromise => {
+      this._transitionPromise = transitionPromise;
+    };
 
     dispatch = action => {
       if (this.props.navigation) {
@@ -327,10 +329,11 @@ export default function createNavigationContainer(Component) {
       );
       const navState = reducedState === null ? lastNavState : reducedState;
 
-      const dispatchActionEvents = () => {
+      const dispatchActionEvents = isPending => {
         this._actionEventSubscribers.forEach(subscriber =>
           subscriber({
             type: 'action',
+            isPending,
             action,
             state: navState,
             lastState: lastNavState,
@@ -341,22 +344,35 @@ export default function createNavigationContainer(Component) {
       if (reducedState === null) {
         // The router will return null when action has been handled and the state hasn't changed.
         // dispatch returns true when something has been handled.
-        dispatchActionEvents();
+        dispatchActionEvents(false);
         return true;
       }
 
       if (navState !== lastNavState) {
         // Cache updates to state.nav during the tick to ensure that subsequent calls will not discard this change
         this._navState = navState;
+        // this._transitionPromise = null;
         this.setState({ nav: navState }, () => {
           this._onNavigationStateChange(lastNavState, navState, action);
-          dispatchActionEvents();
           this._persistNavigationState(navState);
+          if (this._transitionPromise) {
+            dispatchActionEvents(true);
+            this._transitionPromise.then(() => {
+              if (navState !== this.state.nav) {
+                // refuse to emit events if the nav state has changed since the start of the transition
+                return;
+              }
+              dispatchActionEvents(false);
+            });
+            this._transitionPromise = null;
+          } else {
+            dispatchActionEvents(false);
+          }
         });
         return true;
       }
 
-      dispatchActionEvents();
+      dispatchActionEvents(false);
       return false;
     };
 
@@ -376,7 +392,8 @@ export default function createNavigationContainer(Component) {
             this.dispatch,
             this._actionEventSubscribers,
             this._getScreenProps,
-            () => this._navigation
+            () => this._navigation,
+            this._waitForTransition
           );
         }
         navigation = this._navigation;
