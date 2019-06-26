@@ -52,7 +52,7 @@ export default (Navigator, navigatorConfig) =>
 
       const onTransitionStart =
         this.props.onTransitionStart || navigatorConfig.onTransitionStart;
-      onTransitionStart &&
+      return onTransitionStart &&
         onTransitionStart(transitionProps, prevTransitionProps);
     };
   };
