@@ -1,9 +1,7 @@
 import React from 'react';
 import {
-  ScrollView,
+  Animated,
   Platform,
-  FlatList,
-  SectionList,
   RefreshControl,
 } from 'react-native';
 import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
@@ -15,7 +13,7 @@ if (Platform.OS === 'android') {
   // @todo: use GHScrollView again when
   // https://github.com/kmagiera/react-native-gesture-handler/issues/560 has
   // been fixed.
-  WrappedScrollView = createNavigationAwareScrollable(ScrollView);
+  WrappedScrollView = createNavigationAwareScrollable(Animated.ScrollView);
 } else {
   WrappedScrollView = createNavigationAwareScrollable(GHScrollView);
 }
@@ -48,7 +46,7 @@ function propsMaybeWithRefreshControl(props) {
 }
 
 const WrappedFlatList = React.forwardRef((props, ref) => (
-  <FlatList
+  <Animated.FlatList
     ref={ref}
     {...props}
     renderScrollComponent={props => (
@@ -58,7 +56,7 @@ const WrappedFlatList = React.forwardRef((props, ref) => (
 ));
 
 const WrappedSectionList = React.forwardRef((props, ref) => (
-  <SectionList
+  <Animated.SectionList
     ref={ref}
     {...props}
     renderScrollComponent={props => (
