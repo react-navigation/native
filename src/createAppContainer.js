@@ -2,6 +2,7 @@ import React from 'react';
 import { Linking, Platform, BackHandler } from 'react-native';
 import {
   NavigationActions,
+  ThemeProvider,
   pathUtils,
   getNavigation,
   NavigationProvider,
@@ -425,9 +426,11 @@ export default function createNavigationContainer(Component) {
       }
       invariant(navigation, 'failed to get navigation');
       return (
-        <NavigationProvider value={navigation}>
-          <Component {...this.props} navigation={navigation} />
-        </NavigationProvider>
+        <ThemeProvider value={this.props.theme || 'light'}>
+          <NavigationProvider value={navigation}>
+            <Component {...this.props} navigation={navigation} />
+          </NavigationProvider>
+        </ThemeProvider>
       );
     }
   }
