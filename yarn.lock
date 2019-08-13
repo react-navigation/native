@@ -768,10 +768,10 @@
     universal-user-agent "^2.0.0"
     url-template "^2.0.8"
 
-"@react-navigation/core@^3.5.0-alpha":
-  version "3.5.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-3.5.0-alpha.0.tgz#63ce2d9ab44a3b784cadd43f01e1daf26feedef5"
-  integrity sha512-EMAFnNW4EhHQxM+UsQpy/wIhTtAt/MO60+tqEE02M2UP+UH0kMiG1XzxNtkj0EYPoYjnZ3KKtXSMbq4aAWrhfA==
+"@react-navigation/core@^3.5.0-alpha.4":
+  version "3.5.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-3.5.0-alpha.4.tgz#7608d10ca18bc4be62ef52a7bff9fcae0b8b8a3e"
+  integrity sha512-5X6BeUqvIkF3JnTVVJaD9ShXWNQDQ799T9JZPH2FA2hvzQiAmKA25SZLoe1pBg+neUJOKyrZmvsNtUPZfo+Apw==
   dependencies:
     hoist-non-react-statics "^3.3.0"
     path-to-regexp "^1.7.0"
