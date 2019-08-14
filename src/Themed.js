@@ -19,9 +19,18 @@ class ThemedStatusBar extends React.Component {
   static contextType = ThemeContext;
 
   render() {
+    let { barStyle, ...props } = this.props;
+
     return (
       <StatusBar
-        barStyle={this.context === 'dark' ? 'light-content' : 'default'}
+        barStyle={
+          barStyle
+            ? barStyle
+            : this.context === 'dark'
+            ? 'light-content'
+            : 'default'
+        }
+        {...props}
       />
     );
   }

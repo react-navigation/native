@@ -425,8 +425,9 @@ export default function createNavigationContainer(Component) {
         navigation = this._navigation;
       }
       invariant(navigation, 'failed to get navigation');
+
       return (
-        <ThemeProvider value={this.props.theme || 'light'}>
+        <ThemeProvider value={this._getTheme()}>
           <NavigationProvider value={navigation}>
             <Component {...this.props} navigation={navigation} />
           </NavigationProvider>
@@ -434,6 +435,19 @@ export default function createNavigationContainer(Component) {
       );
     }
   }
+
+  _getTheme = () => {
+    if (this.props.theme === 'light' || this.props.theme === 'dark') {
+      return this.props.theme;
+    } else {
+      console.warn(
+        `Invalid theme provided: ${
+          this.props.theme
+        }. Only 'light' and 'dark' are supported. Falling back to 'light'`
+      );
+      return 'light';
+    }
+  };
 
   return NavigationContainer;
 }
