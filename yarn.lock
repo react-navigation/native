@@ -7134,6 +7134,11 @@ react-native-drawer-layout@1.3.2:
   dependencies:
     react-native-dismiss-keyboard "1.0.0"
 
+react-native-safe-area-context@^0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-0.3.5.tgz#1bfe0d1d4f5fb3462c07e3337d2f71eb1932c570"
+  integrity sha512-nh3Q4mmPmaCr1q0hHsReWXL8nlYKXOtLpPNeN57V1bB/QyJ7zL0nYR6c0cDR2/wPBA/DNm4wNllUAT842xb2zw==
+
 react-native-safe-area-view@0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.11.0.tgz#4f3dda43c2bace37965e7c6aef5fc83d4f19d174"
@@ -7141,10 +7146,10 @@ react-native-safe-area-view@0.11.0:
   dependencies:
     hoist-non-react-statics "^2.3.1"
 
-react-native-safe-area-view@^0.14.1:
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.14.1.tgz#3981f6f8628c1769a163313bd8c8eba5edecca0f"
-  integrity sha512-pLAPWdirNWO/1F6IYkbayW9nDIXkM2F/NPtigYNjZj9nISCW+G2dNuI39DI8LenkxYdhiDaGMXfQHHx9TRn6Fw==
+react-native-safe-area-view@^0.14:
+  version "0.14.8"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.14.8.tgz#ef33c46ff8164ae77acad48c3039ec9c34873e5b"
+  integrity sha512-MtRSIcZNstxv87Jet+UsPhEd1tpGe8cVskDXlP657x6rHpSrbrc+y13ZNXrwAgGNNhqQNX7UJT68ZIq//ZRmvw==
   dependencies:
     hoist-non-react-statics "^2.3.1"
 

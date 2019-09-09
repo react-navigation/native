@@ -7,6 +7,7 @@ import {
   getNavigation,
   NavigationProvider,
 } from '@react-navigation/core';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import invariant from './utils/invariant';
 import docsUrl from './utils/docsUrl';
 
@@ -425,11 +426,13 @@ export default function createNavigationContainer(Component) {
       invariant(navigation, 'failed to get navigation');
 
       return (
-        <ThemeProvider value={this._getTheme()}>
-          <NavigationProvider value={navigation}>
-            <Component {...this.props} navigation={navigation} />
-          </NavigationProvider>
-        </ThemeProvider>
+        <SafeAreaProvider>
+          <ThemeProvider value={this._getTheme()}>
+            <NavigationProvider value={navigation}>
+              <Component {...this.props} navigation={navigation} />
+            </NavigationProvider>
+          </ThemeProvider>
+        </SafeAreaProvider>
       );
     }
   }
