@@ -42,16 +42,15 @@ function validateProps(props) {
 
   const keys = Object.keys(containerProps);
 
-  if (keys.length !== 0) {
-    throw new Error(
-      'This navigator has both navigation and container props, so it is ' +
-        `unclear if it should own its own state. Remove props: "${keys.join(
-          ', '
-        )}" ` +
-        'if the navigator should get its state from the navigation prop. If the ' +
-        'navigator should maintain its own state, do not pass a navigation prop.'
-    );
-  }
+  invariant(
+    keys.length === 0,
+    'This navigator has both navigation and container props, so it is ' +
+      `unclear if it should own its own state. Remove props: "${keys.join(
+        ', '
+      )}" ` +
+      'if the navigator should get its state from the navigation prop. If the ' +
+      'navigator should maintain its own state, do not pass a navigation prop.'
+  );
   invariant(
     (persistNavigationState === undefined &&
       loadNavigationState === undefined) ||
@@ -288,14 +287,10 @@ export default function createNavigationContainer(Component) {
     async getStartupParams() {
       const { uriPrefix, loadNavigationState } = this.props;
       let url, loadedNavState;
-      try {
-        [url, loadedNavState] = await Promise.all([
-          Linking.getInitialURL(),
-          loadNavigationState && loadNavigationState(),
-        ]);
-      } catch (err) {
-        // ignore
-      }
+      [url, loadedNavState] = await Promise.all([
+        Linking.getInitialURL(),
+        loadNavigationState && loadNavigationState(),
+      ]);
       return {
         parsedUrl: url && urlToPathAndParams(url, uriPrefix),
         userProvidedStartupState: loadedNavState,
@@ -305,7 +300,7 @@ export default function createNavigationContainer(Component) {
     componentDidCatch(e) {
       if (_reactNavigationIsHydratingState) {
         _reactNavigationIsHydratingState = false;
-        console.warn(
+        console.error(
           'Uncaught exception while starting app from persisted navigation state! Trying to render again with a fresh navigation state...'
         );
         this.dispatch(NavigationActions.init());
@@ -320,7 +315,7 @@ export default function createNavigationContainer(Component) {
         try {
           await persistNavigationState(nav);
         } catch (err) {
-          console.warn(
+          console.error(
             'Uncaught exception while calling persistNavigationState()! You should handle exceptions thrown from persistNavigationState(), ignoring them may result in undefined behavior.'
           );
         }
