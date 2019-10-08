@@ -56,12 +56,12 @@
     "husky": "^0.14.3",
     "jest": "^23.6.0",
     "prettier": "^1.8.2",
-    "react": "16.3.2",
-    "react-dom": "16.3.2",
+    "react": "16.6.3",
+    "react-dom": "16.6.3",
     "react-native": "^0.57.7",
     "react-native-safe-area-context": "^0.3.5",
     "react-navigation": "^3.13.0",
-    "react-test-renderer": "16.3.2",
+    "react-test-renderer": "16.6.3",
     "release-it": "^7.6.1"
   },
   "peerDependencies": {
