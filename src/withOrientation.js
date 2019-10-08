@@ -9,7 +9,7 @@ export default function(WrappedComponent) {
     constructor() {
       super();
 
-      const isLandscape = isOrientationLandscape(Dimensions.get('window'));
+      const isLandscape = isOrientationLandscape(Dimensions.get('screen'));
       this.state = { isLandscape };
     }
 
@@ -21,8 +21,8 @@ export default function(WrappedComponent) {
       Dimensions.removeEventListener('change', this.handleOrientationChange);
     }
 
-    handleOrientationChange = ({ window }) => {
-      const isLandscape = isOrientationLandscape(window);
+    handleOrientationChange = ({ screen }) => {
+      const isLandscape = isOrientationLandscape(screen);
       this.setState({ isLandscape });
     };
 
